@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:pokemon_lets_go_flutter/domain/pokemon_item_list_model.dart';
-import 'package:pokemon_lets_go_flutter/presentation/pages/home/home_bloc.dart';
 import 'package:pokemon_lets_go_flutter/extensions/color_helper.dart';
-import 'package:pokemon_lets_go_flutter/presentation/pages/home/home_events.dart';
+import 'package:pokemon_lets_go_flutter/repositories/pokemon_repository.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,25 +10,54 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  HomeBloc _bloc;
   ScrollController _scrollController;
+
+  PokemonRepository _pokemonRepository;
+
+  /// Quantidade de pokémon por get
+  int _pokemonListLimit = 20;
+  /// Quantidade de pokémon pulado por get
+  int _pokemonListOffset = 0;
+
+  List<PokemonItemListModel> _pokemonList;
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
 
-    _scrollController = ScrollController();
-    _bloc = HomeBloc();
+    _pokemonRepository = PokemonRepository();
 
+    _scrollController = ScrollController();
     _scrollController.addListener(_listenScrollController);
+
+    _getAllPokemon();
   }
 
-  /// Escuta o scroll
-  void _listenScrollController() {
-    // Caso esteja no fim da lista, manda carregar mais pokémon
-    if (_scrollController.position.atEdge) {
-      _bloc.onEventChanged(LoadPokemon());
+  void _getAllPokemon() async {
+    // Se nunca carregou, usa o loader de tela inteira
+    final withLoading = _pokemonList == null;
+
+    if (withLoading) {
+      setState(() => _isLoading = true);
     }
+
+    final remoteList = await _pokemonRepository.getAll(
+      limit: _pokemonListLimit,
+      offset: _pokemonListOffset
+    );
+
+    // Adiciona 20 para "passar de página"
+    _pokemonListOffset += 20;
+
+    final actualList = _pokemonList ?? [];
+    // Soma as duas listas e remove duplicatas
+    final newList = (actualList + remoteList).toSet().toList();
+
+    setState(() {
+      _isLoading = false;
+      _pokemonList = newList;
+    });
   }
 
   @override
@@ -41,18 +69,11 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildBody() {
-    return StreamBuilder<bool>(
-      stream: _bloc.isLoading,
-      builder: (context, snapshot) {
-        final isLoading = snapshot.data ?? false;
-
-        if (isLoading) {
-          return _buildLoader();
-        } else {
-          return _buildList();
-        }
-      },
-    );
+    if (_isLoading) {
+      return _buildLoader();
+    } else {
+      return _buildList();
+    }
   }
 
   Widget _buildLoader() {
@@ -60,37 +81,30 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildList() {
-    return StreamBuilder<List<PokemonItemListModel>>(
-      stream: _bloc.pokemon,
-      builder: (context, snapshot) {
-        final list = snapshot.data;
+    if (_pokemonList == null) {
+      return const SizedBox();
+    }
 
-        if (list == null) {
-          return const SizedBox();
-        }
+    if (_pokemonList.isEmpty) {
+      return Center(
+        child: Text('Nenhum pokémon encontrado na grama alta')
+      );
+    }
 
-        if (list.isEmpty) {
-          return Center(
-            child: Text('Nenhum pokémon encontrado na grama alta')
-          );
-        }
+    return ListView.separated(
+      key: const PageStorageKey('myListView'),
+      controller: _scrollController,
+      padding: const EdgeInsets.all(16.0),
+      separatorBuilder: (context, index) => const SizedBox(height: 16.0),
+      itemCount: _pokemonList.length + 1,
+      itemBuilder: (context, index) {
+        if (_pokemonList.length > index) {
+          final pokemon = _pokemonList[index];
 
-        return ListView.separated(
-          key: const PageStorageKey('myListView'),
-          controller: _scrollController,
-          padding: const EdgeInsets.all(16.0),
-          separatorBuilder: (context, index) => const SizedBox(height: 16.0),
-          itemCount: list.length + 1,
-          itemBuilder: (context, index) {
-            if (list.length > index) {
-              final pokemon = list[index];
-
-              return _buildPokemonCard(pokemon);
-            } else {
-              return _buildBottomLoader();
-            }            
-          },
-        );
+          return _buildPokemonCard(pokemon);
+        } else {
+          return _buildBottomLoader();
+        }            
       },
     );
   }
@@ -170,6 +184,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /// Escuta o scroll
+  void _listenScrollController() {
+    // Caso esteja no fim da lista, manda carregar mais pokémon
+    if (_scrollController.position.atEdge) {
+      _getAllPokemon();
+    }
+  }
+
   Widget _buildPokeBallImage() {
     return Positioned.fill(
       right: 0.0,
@@ -211,5 +233,11 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
