@@ -5,4 +5,4 @@ Basicamente, existem duas branchs no projeto, a main e a set-state, sendo elas:
 - main: Utilizado BLoC para fazer a gerência de estado do projeto;
 - set-state: Utilizado apenas setState para fazer a gerência de estado.
 
-A ideia, em geral, é consumir a PokeAPI e listar os Pokémon, demonstrando conceitos de state management e também requisições http.
+A ideia, em geral, é consumir a PokeAPI e listar os Pokémon, demonstrando conceitos de state management e também requisições http com o Flutter.
