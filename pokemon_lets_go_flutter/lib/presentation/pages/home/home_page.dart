@@ -70,11 +70,13 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (list.isEmpty) {
-          return Text('Nenhum pokémon encontrado na grama alta');
+          return Center(
+            child: Text('Nenhum pokémon encontrado na grama alta')
+          );
         }
 
         return ListView.separated(
-          key: PageStorageKey('myListView'),
+          key: const PageStorageKey('myListView'),
           controller: _scrollController,
           padding: const EdgeInsets.all(16.0),
           separatorBuilder: (context, index) => const SizedBox(height: 16.0),
@@ -97,7 +99,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.1,
       width: double.infinity,
-      child: Center(
+      child: const Center(
         child: CircularProgressIndicator(),
       ),
     );
