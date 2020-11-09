@@ -33,6 +33,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    _bloc?.dispose();
+    _scrollController?.removeListener(_listenScrollController);
+    _scrollController?.dispose();
+
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
@@ -127,25 +136,29 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '#${pokemon.pokemonId}',
-                        style: TextStyle(
-                          color: cardColor.constrast()
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '#${pokemon.pokemonId}',
+                          style: TextStyle(
+                            color: cardColor.constrast()
+                          ),
                         ),
-                      ),
-                      Text(
-                        pokemon.nameDisplay,
-                        style: TextStyle(
-                          color: cardColor.constrast(),
-                          fontSize: 18.0
+                        Expanded(
+                          child: Text(
+                            pokemon.nameDisplay,
+                            style: TextStyle(
+                              color: cardColor.constrast(),
+                              fontSize: 18.0
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Stack(
