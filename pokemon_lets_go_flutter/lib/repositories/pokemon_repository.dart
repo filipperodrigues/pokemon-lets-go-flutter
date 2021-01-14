@@ -1,8 +1,6 @@
 import 'package:pokemon_lets_go_flutter/domain/pokemon_item_list_model.dart';
 
 class PokemonRepository {
-  final String endpoint = 'pokemon';
-
   /// Retorna dados mockados com a ideia de ter uma descrição para cada Pokémon,
   /// facilitando a usabilidade para leitores de tela, sendo que estes agora
   /// terão alguma informação para explicar como é o Pokémon.
