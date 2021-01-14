@@ -1,20 +1,12 @@
-import 'package:http/http.dart' as http;
 import 'package:pokemon_lets_go_flutter/domain/pokemon_item_list_model.dart';
-import 'package:pokemon_lets_go_flutter/core/constants.dart';
-import 'dart:convert';
 
 class PokemonRepository {
   final String endpoint = 'pokemon';
 
-  /// Retorna uma lista paginada de pokémon
-  ///
-  /// [limit] é a quantidade que vai ser retornada
-  /// [offset] é quantos pokémon serão pulados
-  /// exemplos:
-  /// [limit] = 20, [offset] = 0 -> página 1
-  /// [limit] = 20, [offeset] = 20 -> página 2
-  Future<List<PokemonItemListModel>> getAll(
-      {int limit = 20, int offset = 0}) async {
+  /// Retorna dados mockados com a ideia de ter uma descrição para cada Pokémon,
+  /// facilitando a usabilidade para leitores de tela, sendo que estes agora
+  /// terão alguma informação para explicar como é o Pokémon.
+  Future<List<PokemonItemListModel>> getAll() async {
     return const [
       PokemonItemListModel(
         name: 'bulbasaur',

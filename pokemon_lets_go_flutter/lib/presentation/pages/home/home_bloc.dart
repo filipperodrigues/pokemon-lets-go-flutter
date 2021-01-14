@@ -9,11 +9,6 @@ import 'package:rxdart/subjects.dart';
 class HomeBloc extends BaseBloc {
   PokemonRepository _pokemonRepository;
 
-  /// Quantidade de pokémon por get
-  int _pokemonListLimit = 20;
-  /// Quantidade de pokémon pulado por get
-  int _pokemonListOffset = 0;
-
   StreamSubscription _subsEvent;
   
   HomeBloc() {
@@ -40,13 +35,7 @@ class HomeBloc extends BaseBloc {
     doOnlineAction(
       withLoading: withLoading,
       action: () async {
-        final remoteList = await _pokemonRepository.getAll(
-          limit: _pokemonListLimit,
-          offset: _pokemonListOffset
-        );
-
-        // Adiciona 20 para "passar de página"
-        _pokemonListOffset += 20;
+        final remoteList = await _pokemonRepository.getAll();
 
         final actualList = _pokemonController.value ?? [];
         // Soma as duas listas e remove duplicatas
