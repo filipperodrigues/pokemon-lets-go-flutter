@@ -79,9 +79,7 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (list.isEmpty) {
-          return Center(
-            child: Text('Nenhum pokémon encontrado na grama alta')
-          );
+          return Center(child: Text('Nenhum pokémon encontrado na grama alta'));
         }
 
         return ListView.separated(
@@ -89,28 +87,12 @@ class _HomePageState extends State<HomePage> {
           controller: _scrollController,
           padding: const EdgeInsets.all(16.0),
           separatorBuilder: (context, index) => const SizedBox(height: 16.0),
-          itemCount: list.length + 1,
+          itemCount: list.length,
           itemBuilder: (context, index) {
-            if (list.length > index) {
-              final pokemon = list[index];
-
-              return _buildPokemonCard(pokemon);
-            } else {
-              return _buildBottomLoader();
-            }            
+            return _buildPokemonCard(list[index]);
           },
         );
       },
-    );
-  }
-
-  Widget _buildBottomLoader() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.1,
-      width: double.infinity,
-      child: const Center(
-        child: CircularProgressIndicator(),
-      ),
     );
   }
 
@@ -118,87 +100,81 @@ class _HomePageState extends State<HomePage> {
     final imageProvider = NetworkImage(pokemon.spriteUrl);
 
     return FutureBuilder<Color>(
-      future: _getMainColor(imageProvider),
-      initialData: Colors.white,
-      builder: (context, snapshot) {
-        final cardColor = snapshot.data;
+        future: _getMainColor(imageProvider),
+        initialData: Colors.white,
+        builder: (context, snapshot) {
+          final cardColor = snapshot.data;
 
-        return Card(
-          margin: const EdgeInsets.all(0.0),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: const BorderRadius
-                .all(Radius.circular(4.0))
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '#${pokemon.pokemonId}',
-                          style: TextStyle(
-                            color: cardColor.constrast()
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(
-                            pokemon.nameDisplay,
-                            style: TextStyle(
-                              color: cardColor.constrast(),
-                              fontSize: 18.0
+          return Semantics(
+            label: pokemon.description,
+            excludeSemantics: true,
+            child: Card(
+              margin: const EdgeInsets.all(0.0),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.1,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                    color: cardColor,
+                    borderRadius: const BorderRadius.all(Radius.circular(4.0))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '#${pokemon.pokemonId}',
+                              style: TextStyle(color: cardColor.constrast()),
                             ),
-                          ),
+                            Expanded(
+                              child: Text(
+                                pokemon.nameDisplay,
+                                style: TextStyle(
+                                    color: cardColor.constrast(),
+                                    fontSize: 18.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Stack(
+                      children: [
+                        _buildPokeBallImage(),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  fit: BoxFit.fitHeight,
+                                  image: NetworkImage(pokemon.spriteUrl))),
                         ),
                       ],
                     ),
-                  ),
-                ),
-                Stack(
-                  children: [
-                    _buildPokeBallImage(),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.fitHeight,
-                          image: NetworkImage(pokemon.spriteUrl)
-                        )
-                      ),
-                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   Widget _buildPokeBallImage() {
     return Positioned.fill(
       right: 0.0,
-      top: - 10.0,
-      bottom: - 10.0,
+      top: -10.0,
+      bottom: -10.0,
       child: Transform.rotate(
         angle: 0.5,
         child: Opacity(
           opacity: 0.5,
           child: Container(
             decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.fitHeight,
-                image: AssetImage('assets/poke_ball.png')
-              )
-            ),
+                image: DecorationImage(
+                    fit: BoxFit.fitHeight,
+                    image: AssetImage('assets/poke_ball.png'))),
           ),
         ),
       ),
@@ -207,8 +183,8 @@ class _HomePageState extends State<HomePage> {
 
   /// Devolve a cor dominante de uma imagem
   Future<Color> _getMainColor(ImageProvider imageProvider) async {
-    final paletteGenerator = await PaletteGenerator
-        .fromImageProvider(imageProvider);
+    final paletteGenerator =
+        await PaletteGenerator.fromImageProvider(imageProvider);
 
     return paletteGenerator.dominantColor.color;
   }
@@ -219,9 +195,7 @@ class _HomePageState extends State<HomePage> {
       elevation: 0.0,
       title: Text(
         "Let's GO Flutter",
-        style: const TextStyle(
-          color: Colors.black
-        ),
+        style: const TextStyle(color: Colors.black),
       ),
     );
   }

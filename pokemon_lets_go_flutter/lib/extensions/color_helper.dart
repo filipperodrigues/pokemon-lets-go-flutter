@@ -15,5 +15,4 @@ extension ColorHelper on Color {
 
     return Color.fromARGB(255, d, d, d);
   }
-
 }

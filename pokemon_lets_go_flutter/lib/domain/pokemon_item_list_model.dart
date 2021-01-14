@@ -4,6 +4,9 @@ class PokemonItemListModel {
   final String name;
   final String url;
 
+  /// Descrição para o leitor de tela
+  final String description;
+
   String get pokemonId {
     // Quebra a URL nas barras
     final urlSplitted = url.split('/');
@@ -23,33 +26,31 @@ class PokemonItemListModel {
     return '$SPRITE_URL/$pokemonId.png';
   }
 
-  const PokemonItemListModel({
-    this.name, 
-    this.url
-  });
+  const PokemonItemListModel({this.name, this.url, this.description});
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'url': url,
+      'description': description
     };
   }
 
   factory PokemonItemListModel.fromJson(Map<String, dynamic> map) {
     if (map == null) return null;
-  
+
     return PokemonItemListModel(
       name: map['name'],
       url: map['url'],
+      description: map['description']
     );
   }
 
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
-  
-    return o is PokemonItemListModel &&
-      o.pokemonId == pokemonId;
+
+    return o is PokemonItemListModel && o.pokemonId == pokemonId;
   }
 
   @override
